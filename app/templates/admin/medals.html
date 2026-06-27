@@ -1,0 +1,15 @@
+{% extends "admin/layout.html" %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-3"><h4 class="mb-0"><i class="bi bi-award"></i> 勋章管理</h4><a href="{{ url_for('admin.medal_add') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> 添加勋章</a></div>
+<div class="card shadow-sm mb-3"><div class="card-body"><form method="POST" action="{{ url_for('admin.medal_grant') }}" class="row g-2"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="col-md-3"><select name="medal_id" class="form-select form-select-sm">{% for m in medals %}<option value="{{ m.id }}">{{ m.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-3"><input type="text" name="username" class="form-control form-control-sm" placeholder="授予给用户名" required></div>
+    <div class="col-md-2"><button type="submit" class="btn btn-warning btn-sm"><i class="bi bi-gift"></i> 授予</button></div>
+</form></div></div>
+<div class="card shadow-sm"><div class="table-responsive"><table class="table table-hover table-sm mb-0 small"><thead class="table-dark"><tr><th>ID</th><th>名称</th><th>描述</th><th>图标</th><th>条件</th><th>排序</th><th>操作</th></tr></thead>
+<tbody>{% for m in medals %}<tr><td>{{ m.id }}</td><td>{{ m.name }}</td><td class="text-muted">{{ m.description or '' }}</td><td><i class="bi bi-{{ m.icon or 'award' }}"></i></td>
+    <td>{{ m.condition_type }}={{ m.condition_value }}</td><td>{{ m.sort_order }}</td>
+    <td><a href="{{ url_for('admin.medal_edit', medal_id=m.id) }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil"></i></a>
+        <form method="POST" action="{{ url_for('admin.medal_delete', medal_id=m.id) }}" class="d-inline" onsubmit="return confirm('删除?')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button></form></td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

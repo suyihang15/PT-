@@ -1,0 +1,29 @@
+# Flask Core
+Flask==3.1.0
+Flask-SQLAlchemy==3.1.1
+Flask-Migrate==4.0.7
+Flask-Login==0.6.3
+Flask-WTF==1.2.2
+Flask-Caching==2.3.0
+
+# Database
+SQLAlchemy==2.0.36
+
+# Auth & Security
+bcrypt==4.2.1
+email-validator==2.2.0
+
+# Markdown Rendering
+mistune==3.1.0
+
+# Image Processing
+Pillow==11.1.0
+
+# Scheduling
+APScheduler==3.10.4
+
+# Environment
+python-dotenv==1.0.1
+
+# Utils
+bleach==6.2.0

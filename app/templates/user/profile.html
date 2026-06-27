@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ user.username }} - {{ site_name }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-lg-3">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body text-center">
+                <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-2" style="width:80px;height:80px;font-size:2rem;">
+                    {{ user.username[0].upper() }}
+                </div>
+                <h5>{{ user.username }}</h5>
+                <span class="badge bg-primary">{{ user.role }}</span>
+                {% if user.title %}<p class="text-muted small mt-1">{{ user.title }}</p>{% endif %}
+            </div>
+        </div>
+        <div class="card shadow-sm mb-3">
+            <div class="card-header"><h6 class="mb-0">统计</h6></div>
+            <div class="card-body small">
+                <p><strong>注册时间:</strong> {{ user.registered_at.strftime('%Y-%m-%d') }}</p>
+                <p><strong>最后活跃:</strong> {{ user.last_active_at|time_ago if user.last_active_at else '从未' }}</p>
+                <p><strong>上传量:</strong> {{ user.uploaded|format_bytes }}</p>
+                <p><strong>下载量:</strong> {{ user.downloaded|format_bytes }}</p>
+                <p><strong>分享率:</strong> <span class="{{ user.ratio|format_ratio_class }}">{{ user.ratio|format_ratio }}</span></p>
+                <p><strong>积分:</strong> {{ user.seed_bonus }}</p>
+                <p><strong>做种:</strong> {{ user.seeding_count }} | <strong>下载中:</strong> {{ user.leeching_count }}</p>
+                <p><strong>完成:</strong> {{ user.completed_count }} | <strong>发布:</strong> {{ user.torrents.count() }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-9">
+        {% if user.info_text %}
+        <div class="card shadow-sm mb-3">
+            <div class="card-header"><h6 class="mb-0">关于我</h6></div>
+            <div class="card-body">{{ user.info_text|nl2br }}</div>
+        </div>
+        {% endif %}
+        <div class="card shadow-sm mb-3">
+            <div class="card-header"><h6 class="mb-0">最近发布的种子</h6></div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>名称</th><th>大小</th><th>做种</th><th>时间</th></tr></thead>
+                    <tbody>
+                        {% for t in uploads %}
+                        <tr>
+                            <td><a href="{{ url_for('torrent.detail', torrent_id=t.id) }}">{{ t.name|truncate(60) }}</a></td>
+                            <td>{{ t.size|format_bytes }}</td>
+                            <td>{{ t.seeders }}</td>
+                            <td>{{ t.added_at|time_ago }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="text-center text-muted">暂无发布</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

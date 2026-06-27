@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+{% block title %}
+    {% if search_query %}搜索: {{ search_query }}{% elif current_category %}{{ current_category.name }}{% else %}种子列表{% endif %} - {{ site_name }}
+{% endblock %}
+{% block content %}
+<div class="row">
+    <!-- Category Sidebar -->
+    <div class="col-lg-2 d-none d-lg-block">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-folder2"></i> 分类</h6>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{{ url_for('main.browse') }}" class="list-group-item list-group-item-action {{ 'active' if not current_category }}">
+                    全部种子
+                </a>
+                {% for cat in categories if not cat.parent_id %}
+                <a href="{{ url_for('main.browse', category_slug=cat.slug) }}" class="list-group-item list-group-item-action {{ 'active' if current_category and current_category.id == cat.id }}">
+                    <i class="bi bi-{{ cat.icon or 'folder' }}"></i> {{ cat.name }}
+                </a>
+                {% for sub in cat.children %}
+                <a href="{{ url_for('main.browse', category_slug=sub.slug) }}" class="list-group-item list-group-item-action ps-4 small {{ 'active' if current_category and current_category.id == sub.id }}">
+                    {{ sub.name }}
+                </a>
+                {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Quick Filters -->
+        <div class="card shadow-sm mt-3">
+            <div class="card-header"><h6 class="mb-0">快捷筛选</h6></div>
+            <div class="list-group list-group-flush">
+                <a href="{{ url_for('main.browse', sort='seeders') }}" class="list-group-item list-group-item-action small">
+                    <i class="bi bi-arrow-up-circle text-success"></i> 做种最多
+                </a>
+                <a href="{{ url_for('main.browse', sort='leechers') }}" class="list-group-item list-group-item-action small">
+                    <i class="bi bi-arrow-down-circle text-danger"></i> 下载最多
+                </a>
+                <a href="{{ url_for('main.browse', freeleech=1) }}" class="list-group-item list-group-item-action small">
+                    <i class="bi bi-gift text-success"></i> 免费种子
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-lg-10">
+        <!-- Search Header -->
+        {% if search_query %}
+        <div class="alert alert-info">
+            <i class="bi bi-search"></i> 搜索 "<strong>{{ search_query }}</strong>" 的结果：
+            找到 {{ paginated.total }} 个种子
+        </div>
+        {% endif %}
+
+        <!-- Sort Controls -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="mb-0">
+                {% if current_category %}{{ current_category.name }}{% else %}种子列表{% endif %}
+                <small class="text-muted">({{ paginated.total }})</small>
+            </h5>
+            {% set base_args = request.args.copy() %}
+            {% set _ = base_args.pop('sort', None) %}
+            <div class="btn-group btn-group-sm">
+                <a href="{{ url_for(request.endpoint, sort='added_at', **base_args) }}" class="btn btn-outline-secondary {{ 'active' if sort == 'added_at' }}">最新</a>
+                <a href="{{ url_for(request.endpoint, sort='seeders', **base_args) }}" class="btn btn-outline-secondary {{ 'active' if sort == 'seeders' }}">做种</a>
+                <a href="{{ url_for(request.endpoint, sort='size', **base_args) }}" class="btn btn-outline-secondary {{ 'active' if sort == 'size' }}">大小</a>
+                <a href="{{ url_for(request.endpoint, sort='times_completed', **base_args) }}" class="btn btn-outline-secondary {{ 'active' if sort == 'times_completed' }}">完成</a>
+            </div>
+        </div>
+
+        <!-- Torrent Table -->
+        <div class="card shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:40px"></th>
+                            <th>名称</th>
+                            <th class="text-end" style="width:60px" title="做种者"><i class="bi bi-arrow-up-circle text-success"></i></th>
+                            <th class="text-end" style="width:60px" title="下载者"><i class="bi bi-arrow-down-circle text-danger"></i></th>
+                            <th class="text-end" style="width:60px" title="完成数"><i class="bi bi-check-circle text-info"></i></th>
+                            <th class="text-end" style="width:90px">大小</th>
+                            <th style="width:110px">发布者</th>
+                            <th style="width:90px">发布时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for torrent in paginated.items %}
+                            {{ macros.torrent_row(torrent) }}
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-5">
+                                <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                                暂无种子
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        {% if search_query %}
+            {{ macros.pagination(paginated, 'main.search') }}
+        {% elif current_category %}
+            {{ macros.pagination(paginated, 'main.browse', {'category_slug': current_category.slug}) }}
+        {% else %}
+            {{ macros.pagination(paginated, 'main.browse') }}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

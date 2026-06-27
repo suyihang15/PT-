@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ message.subject }} - {{ site_name }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">首页</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('user.messages') }}">私信</a></li>
+                <li class="breadcrumb-item active">{{ message.subject|truncate(30) }}</li>
+            </ol>
+        </nav>
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between">
+                <span><strong>{{ message.subject }}</strong></span>
+                <small class="text-muted">{{ message.sent_at.strftime('%Y-%m-%d %H:%M') }}</small>
+            </div>
+            <div class="card-body">
+                <p class="mb-1"><strong>发件人:</strong> {{ message.sender.username }}</p>
+                <p class="mb-1"><strong>收件人:</strong> {{ message.receiver.username }}</p>
+                <hr>
+                <div>{{ message.content|nl2br }}</div>
+                <hr>
+                {% if message.sender_id == current_user.id %}
+                <a href="{{ url_for('user.messages_sent') }}" class="btn btn-secondary btn-sm">返回</a>
+                {% else %}
+                <a href="{{ url_for('user.messages') }}" class="btn btn-secondary btn-sm">返回</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

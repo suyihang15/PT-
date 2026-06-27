@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block title %}{{ title or '管理面板' }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Admin Sidebar -->
+        <div class="col-lg-2 d-none d-lg-block p-0">
+            <div class="admin-sidebar sticky-top bg-dark text-white" style="top: 56px; min-height: calc(100vh - 56px); overflow-y: auto;">
+                <div class="p-3 border-bottom border-secondary">
+                    <h6 class="mb-0 text-white-50"><i class="bi bi-shield-lock-fill"></i> 管理面板</h6>
+                </div>
+                <nav class="nav flex-column py-2">
+                    <!-- Dashboard -->
+                    <a href="{{ url_for('admin.dashboard') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint == 'admin.dashboard' }}">
+                        <i class="bi bi-speedometer2 me-2"></i>控制面板
+                    </a>
+
+                    {% if current_user.has_permission('can_manage_users') %}
+                    <div class="sidebar-section-label text-white-50 small fw-bold px-3 pt-3 pb-1 text-uppercase">用户管理</div>
+                    <a href="{{ url_for('admin.users') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.users') }}">
+                        <i class="bi bi-people me-2"></i>用户列表
+                    </a>
+                    <a href="{{ url_for('admin.invites') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.invites') }}">
+                        <i class="bi bi-envelope-plus me-2"></i>邀请管理
+                    </a>
+                    <a href="{{ url_for('admin.user_class_list') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.user_class') }}">
+                        <i class="bi bi-bar-chart-steps me-2"></i>等级管理
+                    </a>
+                    {% endif %}
+
+                    {% if current_user.has_permission('can_manage_torrents') %}
+                    <div class="sidebar-section-label text-white-50 small fw-bold px-3 pt-3 pb-1 text-uppercase">种子管理</div>
+                    <a href="{{ url_for('admin.torrents') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.torrents') }}">
+                        <i class="bi bi-cloud-arrow-down me-2"></i>种子列表
+                    </a>
+                    <a href="{{ url_for('admin.categories') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.categories') }}">
+                        <i class="bi bi-folder me-2"></i>分类管理
+                    </a>
+                    <a href="{{ url_for('admin.tags') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.tags') }}">
+                        <i class="bi bi-tags me-2"></i>标签管理
+                    </a>
+                    <a href="{{ url_for('admin.medals') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.medals') }}">
+                        <i class="bi bi-award me-2"></i>勋章管理
+                    </a>
+                    {% endif %}
+
+                    {% if current_user.has_permission('can_resolve_reports') %}
+                    <div class="sidebar-section-label text-white-50 small fw-bold px-3 pt-3 pb-1 text-uppercase">内容审核</div>
+                    <a href="{{ url_for('admin.reports') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.reports') }}">
+                        <i class="bi bi-flag me-2"></i>举报处理
+                        {% set pending = g.get('pending_reports_count', 0) %}
+                        {% if pending > 0 %}<span class="badge bg-danger ms-auto">{{ pending }}</span>{% endif %}
+                    </a>
+                    <a href="{{ url_for('admin.hnr') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.hnr') }}">
+                        <i class="bi bi-exclamation-triangle me-2"></i>H&R违规
+                    </a>
+                    {% endif %}
+
+                    {% if current_user.has_permission('can_manage_news') %}
+                    <div class="sidebar-section-label text-white-50 small fw-bold px-3 pt-3 pb-1 text-uppercase">公告与新闻</div>
+                    <a href="{{ url_for('admin.news_list') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.news') }}">
+                        <i class="bi bi-newspaper me-2"></i>新闻管理
+                    </a>
+                    <a href="{{ url_for('admin.announcements') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.announcements') }}">
+                        <i class="bi bi-megaphone me-2"></i>系统公告
+                    </a>
+                    {% endif %}
+
+                    {% if current_user.has_permission('can_manage_forums') %}
+                    <div class="sidebar-section-label text-white-50 small fw-bold px-3 pt-3 pb-1 text-uppercase">论坛管理</div>
+                    <a href="{{ url_for('admin.forums') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.forums') }}">
+                        <i class="bi bi-chat-dots me-2"></i>论坛管理
+                    </a>
+                    {% endif %}
+
+                    {% if current_user.has_permission('can_manage_bonus') %}
+                    <div class="sidebar-section-label text-white-50 small fw-bold px-3 pt-3 pb-1 text-uppercase">积分与商店</div>
+                    <a href="{{ url_for('admin.bonus_shop') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.bonus_shop') }}">
+                        <i class="bi bi-cart me-2"></i>商店管理
+                    </a>
+                    <a href="{{ url_for('admin.bonus_adjust') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.bonus_adjust') }}">
+                        <i class="bi bi-coin me-2"></i>积分调整
+                    </a>
+                    {% endif %}
+
+                    {% if current_user.has_permission('can_view_ip') or current_user.has_permission('can_manage_ip_bans') %}
+                    <div class="sidebar-section-label text-white-50 small fw-bold px-3 pt-3 pb-1 text-uppercase">安全管理</div>
+                    <a href="{{ url_for('admin.ip_bans') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.ip_bans') }}">
+                        <i class="bi bi-shield-x me-2"></i>IP封禁
+                    </a>
+                    <a href="{{ url_for('admin.ip_whitelist') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.ip_whitelist') }}">
+                        <i class="bi bi-shield-check me-2"></i>IP白名单
+                    </a>
+                    <a href="{{ url_for('admin.multi_accounts') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.multi_accounts') }}">
+                        <i class="bi bi-diagram-3 me-2"></i>多账号检测
+                    </a>
+                    {% endif %}
+
+                    {% if current_user.has_permission('can_view_logs') %}
+                    <div class="sidebar-section-label text-white-50 small fw-bold px-3 pt-3 pb-1 text-uppercase">日志与统计</div>
+                    <a href="{{ url_for('admin.logs') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.logs') }}">
+                        <i class="bi bi-journal-text me-2"></i>操作日志
+                    </a>
+                    <a href="{{ url_for('admin.ip_logs') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.ip_logs') }}">
+                        <i class="bi bi-globe me-2"></i>IP日志
+                    </a>
+                    {% endif %}
+
+                    {% if current_user.has_permission('can_view_stats') %}
+                    <a href="{{ url_for('admin.stats') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.stats') }}">
+                        <i class="bi bi-graph-up me-2"></i>数据统计
+                    </a>
+                    {% endif %}
+
+                    {% if current_user.has_permission('can_manage_settings') %}
+                    <div class="sidebar-section-label text-white-50 small fw-bold px-3 pt-3 pb-1 text-uppercase">系统设置</div>
+                    <a href="{{ url_for('admin.settings') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.settings') }}">
+                        <i class="bi bi-gear me-2"></i>站点设置
+                    </a>
+                    <a href="{{ url_for('admin.qb_config') }}" class="admin-nav-link nav-link text-white px-3 py-2 {{ 'active' if request.endpoint and request.endpoint.startswith('admin.qb_config') }}">
+                        <i class="bi bi-download me-2"></i>QB配置
+                    </a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+
+        <!-- Mobile nav toggle -->
+        <div class="d-lg-none mb-3">
+            <button class="btn btn-dark btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminSidebarOffcanvas">
+                <i class="bi bi-list"></i> 管理菜单
+            </button>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-lg-10 p-4">
+            <!-- Breadcrumb -->
+            {% block breadcrumb %}{% endblock %}
+
+            <!-- Flash Messages handled by base.html -->
+
+            <!-- Admin Content -->
+            {% block admin_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+
+<!-- Mobile sidebar offcanvas -->
+<div class="offcanvas offcanvas-start bg-dark text-white d-lg-none" tabindex="-1" id="adminSidebarOffcanvas">
+    <div class="offcanvas-header border-bottom border-secondary">
+        <h5 class="offcanvas-title"><i class="bi bi-shield-lock-fill"></i> 管理面板</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+        <nav class="nav flex-column py-2">
+            <a href="{{ url_for('admin.dashboard') }}" class="admin-nav-link nav-link text-white px-3 py-2">控制面板</a>
+            <a href="{{ url_for('admin.users') }}" class="admin-nav-link nav-link text-white px-3 py-2">用户列表</a>
+            <a href="{{ url_for('admin.torrents') }}" class="admin-nav-link nav-link text-white px-3 py-2">种子列表</a>
+            <a href="{{ url_for('admin.reports') }}" class="admin-nav-link nav-link text-white px-3 py-2">举报处理</a>
+            <a href="{{ url_for('admin.news_list') }}" class="admin-nav-link nav-link text-white px-3 py-2">新闻管理</a>
+            <a href="{{ url_for('admin.settings') }}" class="admin-nav-link nav-link text-white px-3 py-2">站点设置</a>
+            <a href="{{ url_for('admin.logs') }}" class="admin-nav-link nav-link text-white px-3 py-2">操作日志</a>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.admin-sidebar {
+    border-right: 1px solid rgba(255,255,255,0.1);
+}
+.admin-nav-link {
+    transition: background-color 0.15s ease;
+    border-left: 3px solid transparent;
+}
+.admin-nav-link:hover {
+    background-color: rgba(255,255,255,0.08);
+}
+.admin-nav-link.active {
+    background-color: rgba(13, 110, 253, 0.3);
+    border-left-color: #0d6efd;
+}
+.sidebar-section-label {
+    letter-spacing: 0.05em;
+    font-size: 0.7rem;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "admin/layout.html" %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item"><a href="{{ url_for('admin.categories') }}">分类管理</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<h4 class="mb-3"><i class="bi bi-{{ 'pencil-square' if category else 'plus-circle' }}"></i> {{ title }}</h4>
+<div class="card shadow-sm"><div class="card-body"><form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="row g-3"><div class="col-md-6"><label class="form-label small fw-bold">名称</label><input type="text" name="name" class="form-control form-control-sm" value="{{ category.name if category else '' }}" required></div>
+    <div class="col-md-6"><label class="form-label small fw-bold">Slug</label><input type="text" name="slug" class="form-control form-control-sm" value="{{ category.slug if category else '' }}" required></div>
+    <div class="col-md-4"><label class="form-label small fw-bold">图标 (Bootstrap Icons)</label><input type="text" name="icon" class="form-control form-control-sm" value="{{ category.icon if category else '' }}"></div>
+    <div class="col-md-4"><label class="form-label small fw-bold">排序</label><input type="number" name="sort_order" class="form-control form-control-sm" value="{{ category.sort_order if category else 0 }}"></div>
+    <div class="col-md-4"><label class="form-label small fw-bold">最低查看角色</label><select name="min_role_view" class="form-select form-select-sm"><option value="User">User</option><option value="PowerUser">PowerUser</option><option value="VIP">VIP</option></select></div>
+    <div class="col-md-6"><label class="form-label small fw-bold">父分类</label><select name="parent_id" class="form-select form-select-sm"><option value="">无 (顶级分类)</option>{% for p in parents %}<option value="{{ p.id }}" {% if category and category.parent_id==p.id %}selected{% endif %}>{{ p.name }}</option>{% endfor %}</select></div>
+    </div><button type="submit" class="btn btn-primary mt-3"><i class="bi bi-save"></i> 保存</button>
+    <a href="{{ url_for('admin.categories') }}" class="btn btn-secondary mt-3">取消</a></form></div></div>
+{% endblock %}

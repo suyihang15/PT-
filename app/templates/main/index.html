@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+{% block title %}首页 - {{ site_name }}{% endblock %}
+{% block content %}
+<!-- Stats Bar -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3 col-lg-2">
+        <div class="card bg-primary text-white text-center h-100">
+            <div class="card-body py-2">
+                <div class="fs-4">{{ stats.total_users }}</div>
+                <small>注册用户</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg-2">
+        <div class="card bg-success text-white text-center h-100">
+            <div class="card-body py-2">
+                <div class="fs-4">{{ stats.total_torrents }}</div>
+                <small>种子总数</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg-2">
+        <div class="card bg-info text-white text-center h-100">
+            <div class="card-body py-2">
+                <div class="fs-4">{{ stats.total_seeders }}</div>
+                <small>做种者</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg-2">
+        <div class="card bg-warning text-white text-center h-100">
+            <div class="card-body py-2">
+                <div class="fs-4">{{ stats.total_leechers }}</div>
+                <small>下载者</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg-2">
+        <div class="card bg-secondary text-white text-center h-100">
+            <div class="card-body py-2">
+                <div class="fs-4">{{ stats.total_completed }}</div>
+                <small>完成数</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg-2">
+        <div class="card bg-dark text-white text-center h-100">
+            <div class="card-body py-2">
+                <div class="fs-4">{{ stats.total_size|format_bytes }}</div>
+                <small>总数据量</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Latest Torrents -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> 最新种子</h5>
+                <a href="{{ url_for('main.browse') }}" class="btn btn-sm btn-outline-primary">查看全部</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:40px"></th>
+                            <th>名称</th>
+                            <th class="text-end" style="width:50px">做种</th>
+                            <th class="text-end" style="width:50px">下载</th>
+                            <th class="text-end" style="width:80px">大小</th>
+                            <th style="width:100px">发布者</th>
+                            <th style="width:80px">时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for torrent in latest_torrents %}
+                            {{ macros.torrent_row(torrent) }}
+                        {% else %}
+                        <tr><td colspan="7" class="text-center text-muted py-4">暂无种子</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- User Info (if logged in) -->
+        {% if current_user.is_authenticated %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-person-badge"></i> 我的信息</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>上传量:</strong> {{ current_user.uploaded|format_bytes }}</p>
+                <p><strong>下载量:</strong> {{ current_user.downloaded|format_bytes }}</p>
+                <p><strong>分享率:</strong> <span class="{{ current_user.ratio|format_ratio_class }}">{{ current_user.ratio|format_ratio }}</span></p>
+                <p><strong>积分:</strong> <span class="text-warning">{{ current_user.seed_bonus }}</span></p>
+                <p><strong>做种:</strong> {{ current_user.seeding_count }} | <strong>下载中:</strong> {{ current_user.leeching_count }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Latest News -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-megaphone"></i> 站点公告</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for article in latest_news %}
+                <a href="{{ url_for('main.news_detail', news_id=article.id) }}" class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between">
+                        <span>{{ article.title|truncate(40) }}</span>
+                        <small class="text-muted">{{ article.created_at|time_ago }}</small>
+                    </div>
+                </a>
+                {% else %}
+                <div class="list-group-item text-muted">暂无公告</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Latest Comments -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-chat-left-text"></i> 最新评论</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for comment in latest_comments %}
+                <a href="{{ url_for('torrent.detail', torrent_id=comment.torrent_id) }}#comment-{{ comment.id }}" class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between">
+                        <small>{{ comment.content|truncate(50) }}</small>
+                        <small class="text-muted">{{ comment.created_at|time_ago }}</small>
+                    </div>
+                </a>
+                {% else %}
+                <div class="list-group-item text-muted">暂无评论</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

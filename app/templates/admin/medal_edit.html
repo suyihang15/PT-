@@ -1,0 +1,14 @@
+{% extends "admin/layout.html" %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item"><a href="{{ url_for('admin.medals') }}">勋章管理</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<h4 class="mb-3"><i class="bi bi-{{ 'pencil-square' if medal else 'plus-circle' }}"></i> {{ title }}</h4>
+<div class="card shadow-sm"><div class="card-body"><form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="row g-3"><div class="col-md-6"><label class="form-label small fw-bold">名称</label><input type="text" name="name" class="form-control form-control-sm" value="{{ medal.name if medal else '' }}" required></div>
+    <div class="col-md-6"><label class="form-label small fw-bold">图标</label><input type="text" name="icon" class="form-control form-control-sm" value="{{ medal.icon if medal else '' }}"></div>
+    <div class="col-12"><label class="form-label small fw-bold">描述</label><input type="text" name="description" class="form-control form-control-sm" value="{{ medal.description if medal else '' }}"></div>
+    <div class="col-md-4"><label class="form-label small fw-bold">条件类型</label><select name="condition_type" class="form-select form-select-sm"><option value="manual" {% if medal and medal.condition_type=='manual' %}selected{% endif %}>手动授予</option><option value="upload" {% if medal and medal.condition_type=='upload' %}selected{% endif %}>上传量</option><option value="ratio" {% if medal and medal.condition_type=='ratio' %}selected{% endif %}>分享率</option><option value="seed_time" {% if medal and medal.condition_type=='seed_time' %}selected{% endif %}>做种时间</option></select></div>
+    <div class="col-md-4"><label class="form-label small fw-bold">条件值</label><input type="number" name="condition_value" class="form-control form-control-sm" value="{{ medal.condition_value if medal else 0 }}" step="0.01"></div>
+    <div class="col-md-4"><label class="form-label small fw-bold">排序</label><input type="number" name="sort_order" class="form-control form-control-sm" value="{{ medal.sort_order if medal else 0 }}"></div>
+    </div><button type="submit" class="btn btn-primary mt-3"><i class="bi bi-save"></i> 保存</button>
+    <a href="{{ url_for('admin.medals') }}" class="btn btn-secondary mt-3">取消</a></form></div></div>
+{% endblock %}

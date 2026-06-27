@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+{% block title %}私信{% if folder == 'sent' %} - 已发送{% endif %} - {{ site_name }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <ul class="nav nav-tabs mb-3">
+            <li class="nav-item">
+                <a class="nav-link {{ 'active' if folder == 'inbox' }}" href="{{ url_for('user.messages') }}">收件箱</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ 'active' if folder == 'sent' }}" href="{{ url_for('user.messages_sent') }}">已发送</a>
+            </li>
+        </ul>
+        <div class="card shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead><tr><th>主题</th><th>{{ '发件人' if folder == 'inbox' else '收件人' }}</th><th>时间</th></tr></thead>
+                    <tbody>
+                    {% for msg in paginated.items %}
+                    <tr class="{{ 'fw-bold' if not msg.is_read and folder == 'inbox' }}">
+                        <td><a href="{{ url_for('user.view_message', msg_id=msg.id) }}">{{ msg.subject|truncate(50) }}</a></td>
+                        <td>{% if folder == 'inbox' %}{{ msg.sender.username }}{% else %}{{ msg.receiver.username }}{% endif %}</td>
+                        <td class="text-muted small">{{ msg.sent_at|time_ago }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="3" class="text-center text-muted py-4">暂无消息</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {{ macros.pagination(paginated, 'user.messages' if folder == 'inbox' else 'user.messages_sent') }}
+    </div>
+</div>
+{% endblock %}

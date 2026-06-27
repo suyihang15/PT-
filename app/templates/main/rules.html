@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}站点规则 - {{ site_name }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3 class="mb-4"><i class="bi bi-journal-text"></i> 站点规则</h3>
+
+                <h5>一、总则</h5>
+                <ul>
+                    <li>1.1 本站是私有BT种子分享站点，请遵守所有规则。</li>
+                    <li>1.2 禁止分享违法内容，包括但不限于色情、暴力、政治敏感内容。</li>
+                    <li>1.3 尊重他人，禁止辱骂、人身攻击等不当行为。</li>
+                </ul>
+
+                <h5>二、分享率规则</h5>
+                <ul>
+                    <li>2.1 用户应当维持良好的分享率（上传量/下载量）。</li>
+                    <li>2.2 当分享率低于 <strong>0.4</strong> 时，将无法下载新种子。</li>
+                    <li>2.3 PowerUser 及以上等级可享受更多权限。</li>
+                    <li>2.4 免费种子 (Freeleech) 不计算下载量，但仍计算上传量。</li>
+                </ul>
+
+                <h5>三、Hit & Run (H&R) 规则</h5>
+                <ul>
+                    <li>3.1 下载完成后，需在 <strong>7天</strong> 内累积做种 <strong>72小时</strong> 或分享率达到 <strong>1.0</strong>。</li>
+                    <li>3.2 未满足H&R规则的种子将被标记为违规。</li>
+                    <li>3.3 累计3次H&R违规可能导致账号被封禁。</li>
+                </ul>
+
+                <h5>四、种子发布规则</h5>
+                <ul>
+                    <li>4.1 上传种子前请确认没有重复。</li>
+                    <li>4.2 种子描述应包含完整的资源信息。</li>
+                    <li>4.3 禁止上传含有病毒或恶意软件的种子。</li>
+                </ul>
+
+                <h5>五、用户等级</h5>
+                <table class="table table-bordered">
+                    <thead><tr><th>等级</th><th>升级条件</th><th>特权</th></tr></thead>
+                    <tbody>
+                        <tr><td>User</td><td>注册后默认</td><td>基本功能</td></tr>
+                        <tr><td>PowerUser</td><td>上传>50GB, 分享率>1.05, 注册>4周</td><td>可发邀请</td></tr>
+                        <tr><td>VIP</td><td>管理员授予</td><td>免分享率限制, 更多权限</td></tr>
+                        <tr><td>Moderator</td><td>管理员授予</td><td>管理论坛、举报</td></tr>
+                        <tr><td>Admin</td><td>Sysop授予</td><td>全站管理</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

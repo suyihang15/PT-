@@ -1,0 +1,14 @@
+{% extends "admin/layout.html" %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item"><a href="{{ url_for('admin.announcements') }}">系统公告</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<h4 class="mb-3"><i class="bi bi-{{ 'pencil-square' if announcement else 'plus-circle' }}"></i> {{ title }}</h4>
+<div class="card shadow-sm"><div class="card-body"><form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="mb-3"><label class="form-label small fw-bold">标题</label><input type="text" name="title" class="form-control form-control-sm" value="{{ announcement.title if announcement else '' }}" required></div>
+    <div class="mb-3"><label class="form-label small fw-bold">内容 (支持Markdown)</label><textarea name="content" class="form-control" rows="10">{{ announcement.content if announcement else '' }}</textarea></div>
+    <div class="row g-2 mb-3"><div class="col-md-4"><label class="form-label small">目标角色(留空=全部)</label><select name="target_role" class="form-select form-select-sm"><option value="">全部用户</option>{% for r in roles %}<option value="{{ r }}" {% if announcement and announcement.target_role==r %}selected{% endif %}>{{ r }}</option>{% endfor %}</select></div>
+    <div class="col-md-4"><label class="form-label small">显示天数(留空=永久)</label><input type="number" name="show_days" class="form-control form-control-sm" placeholder="例如: 7"></div></div>
+    <div class="form-check form-check-inline mb-3"><input class="form-check-input" type="checkbox" name="is_pinned" {% if announcement and announcement.is_pinned %}checked{% endif %}><label class="form-check-label small">置顶</label></div>
+    <div class="form-check form-check-inline mb-3"><input class="form-check-input" type="checkbox" name="is_published" {% if not announcement or announcement.is_published %}checked{% endif %}><label class="form-check-label small">立即发布</label></div>
+    <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> {{ '发布' if not announcement else '保存' }}</button>
+    <a href="{{ url_for('admin.announcements') }}" class="btn btn-secondary">取消</a></form></div></div>
+{% endblock %}

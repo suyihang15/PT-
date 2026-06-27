@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}设置 - {{ site_name }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h4 class="mb-3"><i class="bi bi-gear"></i> 用户设置</h4>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <h6>外观</h6>
+                    <div class="mb-3">
+                        <label class="form-label">主题</label>
+                        <select name="theme" class="form-select" style="width:200px">
+                            <option value="light" {{ 'selected' if current_user.theme == 'light' }}>浅色</option>
+                            <option value="dark" {{ 'selected' if current_user.theme == 'dark' }}>深色</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">每页显示项目数</label>
+                        <input type="number" name="items_per_page" class="form-control" style="width:200px"
+                               value="{{ current_user.items_per_page }}" min="10" max="100">
+                    </div>
+                    <h6>个人资料</h6>
+                    <div class="mb-3">
+                        <label class="form-label">签名</label>
+                        <input type="text" name="signature" class="form-control" maxlength="512"
+                               value="{{ current_user.signature or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">个人简介</label>
+                        <textarea name="info_text" class="form-control" rows="4">{{ current_user.info_text or '' }}</textarea>
+                    </div>
+                    <h6>通知</h6>
+                    <div class="form-check mb-2">
+                        <input type="checkbox" name="notify_comment" class="form-check-input" id="notify_comment"
+                               {{ 'checked' if current_user.notify_comment }}>
+                        <label class="form-check-label" for="notify_comment">评论通知</label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" name="notify_pm" class="form-check-input" id="notify_pm"
+                               {{ 'checked' if current_user.notify_pm }}>
+                        <label class="form-check-label" for="notify_pm">私信通知</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">保存设置</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

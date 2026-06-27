@@ -1,0 +1,26 @@
+{% extends "admin/layout.html" %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<h4 class="mb-3"><i class="bi bi-gear"></i> 站点设置</h4>
+<div class="row g-3">
+    <div class="col-lg-6"><div class="card shadow-sm mb-3"><div class="card-header py-2"><strong>基本设置</strong></div><div class="card-body"><form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="section" value="basic">
+        <div class="mb-2"><label class="form-label small fw-bold">站点名称</label><input type="text" name="site_name" class="form-control form-control-sm" value="{% for s in settings_list if s.key=='site_name' %}{{ s.value or '' }}{% endfor %}"></div>
+        <div class="mb-2"><label class="form-label small fw-bold">站点描述</label><input type="text" name="site_description" class="form-control form-control-sm" value="{% for s in settings_list if s.key=='site_description' %}{{ s.value or '' }}{% endfor %}"></div>
+        <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="invite_only" value="true" {% for s in settings_list if s.key=='invite_only' %}{% if s.get_value() %}checked{% endif %}{% endfor %}><label class="form-check-label small">仅允许邀请注册</label></div>
+        <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="register_open" value="true" {% for s in settings_list if s.key=='register_open' %}{% if s.get_value() %}checked{% endif %}{% endfor %}><label class="form-check-label small">开放注册</label></div>
+        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-save"></i> 保存</button></form></div></div></div>
+    <div class="col-lg-6"><div class="card shadow-sm mb-3"><div class="card-header py-2"><strong>Tracker设置</strong></div><div class="card-body"><form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="section" value="tracker">
+        <div class="mb-2"><label class="form-label small fw-bold">汇报间隔(秒)</label><input type="number" name="announce_interval" class="form-control form-control-sm" value="1800"></div>
+        <div class="mb-2"><label class="form-label small fw-bold">最小汇报间隔(秒)</label><input type="number" name="announce_min_interval" class="form-control form-control-sm" value="900"></div>
+        <div class="mb-2"><label class="form-label small fw-bold">Peer过期(秒)</label><input type="number" name="peer_expire_seconds" class="form-control form-control-sm" value="1800"></div>
+        <div class="mb-2"><label class="form-label small fw-bold">最大返回Peer数</label><input type="number" name="peer_limit" class="form-control form-control-sm" value="50"></div>
+        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-save"></i> 保存</button></form></div></div></div>
+    <div class="col-lg-6"><div class="card shadow-sm mb-3"><div class="card-header py-2"><strong>分享率与H&R</strong></div><div class="card-body"><form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="section" value="ratio">
+        <div class="mb-2"><label class="form-label small fw-bold">最低下载分享率</label><input type="number" name="min_ratio_to_download" class="form-control form-control-sm" value="0.4" step="0.1"></div>
+        <div class="mb-2"><label class="form-label small fw-bold">H&R最低做种(小时)</label><input type="number" name="hnr_min_seed_hours" class="form-control form-control-sm" value="72"></div>
+        <div class="mb-2"><label class="form-label small fw-bold">H&R最低分享率</label><input type="number" name="hnr_min_ratio" class="form-control form-control-sm" value="1.0" step="0.1"></div>
+        <div class="mb-2"><label class="form-label small fw-bold">H&R豁免期(小时)</label><input type="number" name="hnr_grace_hours" class="form-control form-control-sm" value="168"></div>
+        <div class="mb-2"><label class="form-label small fw-bold">基础积分率(每小时)</label><input type="number" name="default_bonus_per_hour" class="form-control form-control-sm" value="1.0" step="0.1"></div>
+        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-save"></i> 保存</button></form></div></div></div>
+</div>
+{% endblock %}

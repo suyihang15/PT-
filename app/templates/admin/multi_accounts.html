@@ -1,0 +1,17 @@
+{% extends "admin/layout.html" %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<h4 class="mb-3"><i class="bi bi-diagram-3"></i> 多账号检测</h4>
+<p class="text-muted small">检测同一IP登录过多个不同账号的情况。</p>
+{% if results %}
+<div class="row g-3">{% for r in results %}
+    <div class="col-lg-6"><div class="card shadow-sm border-warning">
+        <div class="card-header bg-warning text-dark py-2"><strong><code>{{ r.ip }}</code></strong> — {{ r.user_count }} 个账号共用此IP</div>
+        <div class="list-group list-group-flush small">{% for u in r.users %}
+            <a href="{{ url_for('admin.user_edit', user_id=u.id) }}" class="list-group-item list-group-item-action d-flex justify-content-between">
+                <span><strong>{{ u.username }}</strong> <span class="badge bg-secondary ms-1">{{ u.role }}</span></span>
+                <span class="text-muted">注册: {{ u.registered_at|time_ago }}</span>
+            </a>{% endfor %}</div>
+    </div></div>{% endfor %}</div>
+{% else %}<div class="alert alert-info">未发现明显的多账号情况。</div>{% endif %}
+{% endblock %}

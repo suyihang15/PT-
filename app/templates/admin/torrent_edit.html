@@ -1,0 +1,55 @@
+{% extends "admin/layout.html" %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item"><a href="{{ url_for('admin.torrents') }}">种子管理</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<h4 class="mb-3"><i class="bi bi-pencil-square"></i> {{ title }}</h4>
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card shadow-sm"><div class="card-body">
+            <form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="save">
+                <div class="mb-2"><label class="form-label small fw-bold">种子名称</label><input type="text" name="name" class="form-control form-control-sm" value="{{ torrent.name }}"></div>
+                <div class="row g-2 mb-2">
+                    <div class="col-md-4"><label class="form-label small fw-bold">分类</label><select name="category_id" class="form-select form-select-sm">{% for cat in categories %}<option value="{{ cat.id }}" {% if torrent.category_id==cat.id %}selected{% endif %}>{{ '— ' if cat.parent_id else '' }}{{ cat.name }}</option>{% endfor %}</select></div>
+                    <div class="col-md-4"><label class="form-label small fw-bold">可见性</label><div class="form-check mt-1"><input class="form-check-input" type="checkbox" name="visible" {% if torrent.visible %}checked{% endif %}><label class="form-check-label small">可见</label></div></div>
+                    <div class="col-md-4"><label class="form-label small fw-bold">匿名</label><div class="form-check mt-1"><input class="form-check-input" type="checkbox" name="anonymous" {% if torrent.anonymous %}checked{% endif %}><label class="form-check-label small">匿名发布</label></div></div>
+                </div>
+                <div class="mb-2"><label class="form-label small fw-bold">描述</label><textarea name="description" class="form-control form-control-sm" rows="6">{{ torrent.description or '' }}</textarea></div>
+                <h6 class="border-bottom pb-1 small text-muted mt-3">促销设置</h6>
+                <div class="row g-2 mb-2">
+                    <div class="col-md-4"><label class="form-label small">免费 (天数, 0=关闭)</label><input type="number" name="freeleech_days" class="form-control form-control-sm" value="0" min="0"><div class="form-check small"><input class="form-check-input" type="checkbox" name="freeleech_unlimited"><label class="form-check-label">不限时</label></div></div>
+                    <div class="col-md-4"><label class="form-label small">双倍上传 (天数)</label><input type="number" name="double_upload_days" class="form-control form-control-sm" value="0" min="0"><div class="form-check small"><input class="form-check-input" type="checkbox" name="double_upload_unlimited"><label class="form-check-label">不限时</label></div></div>
+                    <div class="col-md-4"><label class="form-label small">半下载 (天数)</label><input type="number" name="half_download_days" class="form-control form-control-sm" value="0" min="0"><div class="form-check small"><input class="form-check-input" type="checkbox" name="half_download_unlimited"><label class="form-check-label">不限时</label></div></div>
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-md-4"><label class="form-label small">置顶 (天数, 0=取消)</label><input type="number" name="sticky_days" class="form-control form-control-sm" value="0" min="0"></div>
+                </div>
+                <div class="mb-2"><label class="form-label small fw-bold">管理备注</label><textarea name="moderation_note" class="form-control form-control-sm" rows="2">{{ torrent.moderation_note or '' }}</textarea></div>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> 保存修改</button>
+            </form>
+        </div></div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm mb-3"><div class="card-header py-2"><strong>种子信息</strong></div>
+            <div class="card-body small">
+                <p class="mb-1"><strong>ID:</strong> {{ torrent.id }}</p>
+                <p class="mb-1"><strong>Info Hash:</strong> <code>{{ torrent.info_hash }}</code></p>
+                <p class="mb-1"><strong>大小:</strong> {{ torrent.size|format_bytes }}</p>
+                <p class="mb-1"><strong>文件数:</strong> {{ torrent.file_count }}</p>
+                <p class="mb-1"><strong>上传者:</strong> {{ torrent.uploader.username }}</p>
+                <p class="mb-1"><strong>做种/下载:</strong> {{ torrent.seeders }}/{{ torrent.leechers }}</p>
+                <p class="mb-1"><strong>完成:</strong> {{ torrent.times_completed }} 次</p>
+                <p class="mb-1"><strong>发布时间:</strong> {{ torrent.added_at.strftime('%Y-%m-%d %H:%M') if torrent.added_at else '?' }}</p>
+            </div>
+        </div>
+        <div class="card shadow-sm"><div class="card-header py-2"><strong>管理操作</strong></div>
+            <div class="card-body">
+                {% if torrent.banned %}
+                <form method="POST" class="mb-2"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="unban"><button type="submit" class="btn btn-success btn-sm w-100"><i class="bi bi-check-circle"></i> 恢复种子</button></form>
+                {% else %}
+                <form method="POST" class="mb-2"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="ban"><input type="text" name="banned_reason" class="form-control form-control-sm mb-2" placeholder="禁用理由"><button type="submit" class="btn btn-warning btn-sm w-100"><i class="bi bi-x-circle"></i> 禁用种子</button></form>
+                {% endif %}
+                <form method="POST" onsubmit="return confirm('确定要删除此种子吗？此操作不可撤销。');"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="delete"><button type="submit" class="btn btn-danger btn-sm w-100"><i class="bi bi-trash"></i> 删除种子</button></form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

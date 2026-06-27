@@ -1,0 +1,11 @@
+{% extends "admin/layout.html" %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<h4 class="mb-3"><i class="bi bi-coin"></i> 积分调整</h4>
+<div class="card shadow-sm"><div class="card-body"><form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="mb-3"><label class="form-label small fw-bold">用户名</label><input type="text" name="username" class="form-control" placeholder="输入用户名" required></div>
+    <div class="mb-3"><label class="form-label small fw-bold">积分数量 (正数=增加, 负数=扣除)</label><input type="number" name="points" class="form-control" step="0.01" placeholder="例如: 100 或 -50" required></div>
+    <div class="mb-3"><label class="form-label small fw-bold">调整理由</label><textarea name="reason" class="form-control" rows="2" placeholder="填写调整理由..."></textarea></div>
+    <button type="submit" class="btn btn-warning"><i class="bi bi-arrow-left-right"></i> 执行调整</button>
+</form></div></div>
+{% endblock %}

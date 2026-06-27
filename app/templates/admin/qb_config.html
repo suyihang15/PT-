@@ -1,0 +1,13 @@
+{% extends "admin/layout.html" %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<h4 class="mb-3"><i class="bi bi-download"></i> qBittorrent同步配置</h4>
+<div class="card shadow-sm"><div class="card-body"><form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-check mb-3"><input class="form-check-input" type="checkbox" name="qb_enabled" id="qb_enabled" {% if qb_enabled %}checked{% endif %}><label class="form-check-label small" for="qb_enabled">启用全局QB同步</label></div>
+    <div class="row g-3"><div class="col-md-4"><label class="form-label small fw-bold">同步间隔(分钟)</label><input type="number" name="qb_interval" class="form-control form-control-sm" value="{{ qb_interval }}"></div>
+    <div class="col-md-4"><label class="form-label small fw-bold">默认QB主机</label><input type="text" name="qb_host" class="form-control form-control-sm" value="{{ qb_host }}" placeholder="例: localhost"></div>
+    <div class="col-md-4"><label class="form-label small fw-bold">默认端口</label><input type="number" name="qb_port" class="form-control form-control-sm" value="{{ qb_port }}"></div></div>
+    <p class="text-muted small mt-2">用户可在个人设置中覆盖默认QB连接配置并启用个人同步。</p>
+    <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> 保存配置</button>
+</form></div></div>
+{% endblock %}

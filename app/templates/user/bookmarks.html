@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+{% block title %}我的收藏 - {{ site_name }}{% endblock %}
+{% block content %}
+<h4 class="mb-3"><i class="bi bi-bookmark-fill text-warning"></i> 我的收藏</h4>
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead><tr><th></th><th>名称</th><th class="text-end">做种</th><th class="text-end">大小</th><th>发布时间</th></tr></thead>
+            <tbody>
+                {% for bookmark in paginated.items %}
+                    {{ macros.torrent_row(bookmark.torrent) }}
+                {% else %}
+                <tr><td colspan="5" class="text-center text-muted py-4">暂无收藏</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{ macros.pagination(paginated, 'user.bookmarks') }}
+{% endblock %}

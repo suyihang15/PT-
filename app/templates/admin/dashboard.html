@@ -1,0 +1,99 @@
+{% extends "admin/layout.html" %}
+{% import "macros.html" as macros %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li>
+        <li class="breadcrumb-item active">{{ title }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0"><i class="bi bi-speedometer2"></i> 控制面板</h4>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm bg-primary bg-opacity-10">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div><h6 class="text-primary mb-0 fs-4">{{ stats.total_users }}</h6><small class="text-muted">总用户</small></div>
+                    <i class="bi bi-people fs-2 text-primary opacity-50"></i>
+                </div>
+                <div class="mt-2 small text-muted">活跃: {{ stats.active_users }} | 封禁: {{ stats.banned_users }}{% if stats.new_users_today %} | 今日: +{{ stats.new_users_today }}{% endif %}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm bg-success bg-opacity-10">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div><h6 class="text-success mb-0 fs-4">{{ stats.total_torrents }}</h6><small class="text-muted">总种子</small></div>
+                    <i class="bi bi-cloud-arrow-down fs-2 text-success opacity-50"></i>
+                </div>
+                <div class="mt-2 small text-muted">可见: {{ stats.visible_torrents }}{% if stats.new_torrents_today %} | 今日: +{{ stats.new_torrents_today }}{% endif %}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm bg-info bg-opacity-10">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div><h6 class="text-info mb-0 fs-4">{{ stats.total_peers }}</h6><small class="text-muted">活跃连接</small></div>
+                    <i class="bi bi-arrow-repeat fs-2 text-info opacity-50"></i>
+                </div>
+                <div class="mt-2 small text-muted">做种: {{ stats.active_seeders }} | 下载: {{ stats.active_leechers }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm bg-warning bg-opacity-10">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div><h6 class="text-warning mb-0 fs-4">{{ stats.pending_reports }}</h6><small class="text-muted">待处理</small></div>
+                    <i class="bi bi-flag fs-2 text-warning opacity-50"></i>
+                </div>
+                <div class="mt-2 small text-muted">举报: {{ stats.pending_reports }} | H&R: {{ stats.pending_hnr }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white py-2"><i class="bi bi-journal-text"></i> 最近操作记录</div>
+            <div class="table-responsive"><table class="table table-sm table-hover mb-0 small">
+                <thead class="table-light"><tr><th>执行人</th><th>操作</th><th>详情</th><th>时间</th></tr></thead>
+                <tbody>
+                    {% if recent_logs %}{% for log in recent_logs %}
+                    <tr>
+                        <td>{{ log.actor.username if log.actor else '系统' }}</td>
+                        <td><span class="badge bg-{{ 'danger' if log.severity == 'danger' else 'warning' if log.severity == 'warning' else 'success' if log.severity == 'success' else 'secondary' }}">{{ log.action }}</span></td>
+                        <td class="text-muted text-truncate" style="max-width:250px;">{{ log.details or '' }}</td>
+                        <td>{{ log.created_at|time_ago }}</td>
+                    </tr>{% endfor %}{% else %}
+                    <tr><td colspan="4" class="text-center text-muted py-3">暂无操作记录</td></tr>{% endif %}
+                </tbody>
+            </table></div>
+            <div class="card-footer text-end small"><a href="{{ url_for('admin.logs') }}">全部日志 <i class="bi bi-arrow-right"></i></a></div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white py-2"><i class="bi bi-person-plus"></i> 最近注册</div>
+            <div class="list-group list-group-flush small">
+                {% if recent_users %}{% for u in recent_users %}
+                <a href="{{ url_for('admin.user_edit', user_id=u.id) }}" class="list-group-item list-group-item-action d-flex justify-content-between">
+                    <div><strong>{{ u.username }}</strong> <span class="badge bg-{{ 'warning' if u.role == 'VIP' else 'info' if u.role == 'Moderator' else 'danger' if u.role in ('Admin','Sysop') else 'success' if u.role == 'PowerUser' else 'secondary' }}">{{ u.role }}</span></div>
+                    <small class="text-muted">{{ u.registered_at|time_ago }}</small>
+                </a>{% endfor %}{% else %}<div class="list-group-item text-muted text-center py-3">暂无</div>{% endif %}
+            </div>
+            <div class="card-footer text-end small"><a href="{{ url_for('admin.users') }}">全部用户 <i class="bi bi-arrow-right"></i></a></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

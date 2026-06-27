@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}编辑用户 - {{ user.username }}{% endblock %}
+{% block content %}
+<nav><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">首页</a></li><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item"><a href="{{ url_for('admin.users') }}">用户管理</a></li><li class="breadcrumb-item active">{{ user.username }}</li></ol></nav>
+<h4 class="mb-3"><i class="bi bi-pencil-square"></i> 编辑用户: {{ user.username }}</h4>
+<div class="card shadow-sm"><div class="card-body">
+<form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="row">
+<div class="col-md-6 mb-3"><label class="form-label">角色</label><select name="role" class="form-select">{% for r in ['User','PowerUser','VIP','Moderator','Admin','Sysop'] %}<option value="{{ r }}" {{ 'selected' if user.role == r }}>{{ r }}</option>{% endfor %}</select></div>
+<div class="col-md-6 mb-3"><label class="form-label">积分</label><input type="number" name="seed_bonus" class="form-control" value="{{ user.seed_bonus }}" step="0.01"></div>
+<div class="col-md-6 mb-3"><label class="form-label">邀请名额</label><input type="number" name="invite_tokens" class="form-control" value="{{ user.invite_tokens }}"></div>
+<div class="col-md-6 mb-3"><label class="form-label">警告次数</label><input type="number" name="warning_count" class="form-control" value="{{ user.warning_count }}"></div>
+<div class="col-12 mb-3"><div class="form-check"><input type="checkbox" name="is_banned" class="form-check-input" id="is_banned" {{ 'checked' if user.is_banned }}><label class="form-check-label" for="is_banned">封禁用户</label></div></div>
+<div class="col-12 mb-3"><label class="form-label">封禁原因</label><textarea name="banned_reason" class="form-control" rows="2">{{ user.banned_reason or '' }}</textarea></div>
+</div>
+<button type="submit" class="btn btn-primary">保存修改</button>
+<a href="{{ url_for('admin.users') }}" class="btn btn-secondary">取消</a>
+</form></div></div>
+{% endblock %}

@@ -1,0 +1,93 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('main.index') }}">
+            <i class="bi bi-cloud-arrow-down-fill"></i> {{ site_name }}
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'main.index' }}" href="{{ url_for('main.index') }}">
+                        <i class="bi bi-house"></i> 首页
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'main.browse' }}" href="{{ url_for('main.browse') }}">
+                        <i class="bi bi-grid"></i> 种子列表
+                    </a>
+                </li>
+                {% if current_user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint and 'torrent.upload' in request.endpoint }}" href="{{ url_for('torrent.upload') }}">
+                        <i class="bi bi-cloud-upload"></i> 发布
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint and 'bonus' in request.endpoint }}" href="{{ url_for('bonus.index') }}">
+                        <i class="bi bi-coin"></i> 积分中心
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint and 'forum' in request.endpoint }}" href="{{ url_for('forum.index') }}">
+                        <i class="bi bi-chat-dots"></i> 论坛
+                    </a>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('main.rules') }}">
+                        <i class="bi bi-journal-text"></i> 规则
+                    </a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center gap-2">
+                {% include 'layout/search_bar.html' %}
+                {% if current_user.is_authenticated %}
+                    {% if unread_pm_count > 0 %}
+                    <a href="{{ url_for('user.messages') }}" class="btn btn-outline-light position-relative" title="私信">
+                        <i class="bi bi-envelope-fill"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ unread_pm_count }}
+                        </span>
+                    </a>
+                    {% endif %}
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ current_user.username }}
+                            <span class="badge bg-info ms-1">{{ current_user.role }}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ url_for('user.profile', user_id=current_user.id) }}">
+                                <i class="bi bi-person"></i> 个人主页
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('user.bookmarks') }}">
+                                <i class="bi bi-bookmark"></i> 收藏夹
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('user.settings') }}">
+                                <i class="bi bi-gear"></i> 设置
+                            </a></li>
+                            {% if current_user.role in ('Moderator', 'Admin', 'Sysop') %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">
+                                <i class="bi bi-shield-check"></i> 管理面板
+                            </a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                <i class="bi bi-box-arrow-right"></i> 退出登录
+                            </a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light">
+                        <i class="bi bi-box-arrow-in-right"></i> 登录
+                    </a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary">
+                        <i class="bi bi-person-plus"></i> 注册
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>

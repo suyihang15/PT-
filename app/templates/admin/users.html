@@ -1,0 +1,41 @@
+{% extends "admin/layout.html" %}
+{% import "macros.html" as macros %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>
+{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0"><i class="bi bi-people"></i> 用户管理</h4>
+    <span class="text-muted small">共 {{ paginated.total }} 个用户</span>
+</div>
+<div class="card shadow-sm mb-3"><div class="card-body py-2">
+    <form method="GET" action="{{ url_for('admin.users') }}" class="row g-2">
+        <div class="col-md-3"><input type="text" name="q" class="form-control form-control-sm" placeholder="搜索用户名/邮箱..." value="{{ search_params.get('q','') }}"></div>
+        <div class="col-md-2"><select name="role" class="form-select form-select-sm"><option value="">全部角色</option>{% for r, lvl in roles.items() %}<option value="{{ r }}" {% if search_params.get('role')==r %}selected{% endif %}>{{ role_display.get(r,r) }}</option>{% endfor %}</select></div>
+        <div class="col-md-2"><select name="status" class="form-select form-select-sm"><option value="">全部状态</option><option value="active" {% if search_params.get('status')=='active' %}selected{% endif %}>正常</option><option value="banned" {% if search_params.get('status')=='banned' %}selected{% endif %}>已封禁</option><option value="disabled" {% if search_params.get('status')=='disabled' %}selected{% endif %}>已禁用</option></select></div>
+        <div class="col-md-2"><select name="sort" class="form-select form-select-sm"><option value="registered_at_desc" selected>注册时间↓</option><option value="uploaded_desc">上传量↓</option><option value="downloaded_desc">下载量↓</option><option value="seed_bonus_desc">积分↓</option></select></div>
+        <div class="col-md-3"><button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-search"></i> 搜索</button> <a href="{{ url_for('admin.users') }}" class="btn btn-outline-secondary btn-sm">清除</a></div>
+    </form>
+</div></div>
+
+<div class="card shadow-sm"><div class="table-responsive"><table class="table table-hover table-sm mb-0 small">
+    <thead class="table-dark"><tr><th>ID</th><th>用户名</th><th>邮箱</th><th>角色</th><th>分享率</th><th>上传</th><th>下载</th><th>积分</th><th>状态</th><th>注册</th><th>操作</th></tr></thead>
+    <tbody>{% for u in paginated.items %}
+    <tr class="{% if u.is_banned %}table-danger{% elif not u.is_active %}table-secondary{% endif %}">
+        <td>{{ u.id }}</td>
+        <td><a href="{{ url_for('admin.user_edit', user_id=u.id) }}"><strong>{{ u.username }}</strong></a>{% if u.title %}<br><small class="text-muted">{{ u.title }}</small>{% endif %}</td>
+        <td class="text-muted small">{{ u.email }}</td>
+        <td><span class="badge bg-{{ 'warning' if u.role=='VIP' else 'info' if u.role=='Moderator' else 'danger' if u.role in ('Admin','Sysop') else 'success' if u.role=='PowerUser' else 'secondary' }}">{{ role_display.get(u.role, u.role) }}</span></td>
+        <td><span class="{{ u.ratio|format_ratio_class }}">{{ u.ratio|format_ratio }}</span></td>
+        <td>{{ u.uploaded|format_bytes }}</td>
+        <td>{{ u.downloaded|format_bytes }}</td>
+        <td>{{ "%.0f"|format(u.seed_bonus or 0) }}</td>
+        <td>{% if u.is_banned %}<span class="badge bg-danger">封禁</span>{% elif not u.is_active %}<span class="badge bg-secondary">禁用</span>{% else %}<span class="badge bg-success">正常</span>{% endif %}</td>
+        <td>{{ u.registered_at|time_ago }}</td>
+        <td><a href="{{ url_for('admin.user_edit', user_id=u.id) }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil"></i></a></td>
+    </tr>{% else %}<tr><td colspan="11" class="text-center text-muted py-4">没有找到匹配的用户</td></tr>{% endfor %}</tbody>
+</table></div>
+<div class="card-footer py-2">{{ macros.pagination(paginated, 'admin.users', **search_params) }}</div></div>
+{% endblock %}

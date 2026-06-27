@@ -1,0 +1,40 @@
+{% extends "admin/layout.html" %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item"><a href="{{ url_for('admin.user_class_list') }}">等级管理</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<h4 class="mb-3"><i class="bi bi-{{ 'pencil-square' if user_class else 'plus-circle' }}"></i> {{ title }}</h4>
+<form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="row g-3">
+    <div class="col-lg-6"><div class="card shadow-sm mb-3"><div class="card-header py-2"><strong>基本信息</strong></div><div class="card-body">
+        <div class="row g-2"><div class="col-md-6"><label class="form-label small fw-bold">角色名 (映射User.role)</label><input type="text" name="name" class="form-control form-control-sm" value="{{ user_class.name if user_class else '' }}" placeholder="PowerUser" required></div>
+        <div class="col-md-6"><label class="form-label small fw-bold">显示名称</label><input type="text" name="display_name" class="form-control form-control-sm" value="{{ user_class.display_name if user_class else '' }}" placeholder="高级用户" required></div>
+        <div class="col-md-3"><label class="form-label small">等级</label><input type="number" name="level" class="form-control form-control-sm" value="{{ user_class.level if user_class else 0 }}"></div>
+        <div class="col-md-3"><label class="form-label small">排序</label><input type="number" name="sort_order" class="form-control form-control-sm" value="{{ user_class.sort_order if user_class else 0 }}"></div>
+        <div class="col-md-3"><label class="form-label small">颜色</label><input type="color" name="color" class="form-control form-control-sm" value="{{ user_class.color if user_class else '#6c757d' }}"></div>
+        <div class="col-md-3"><label class="form-label small">图标</label><input type="text" name="icon" class="form-control form-control-sm" value="{{ user_class.icon if user_class else '' }}"></div></div></div></div></div>
+    <div class="col-lg-6"><div class="card shadow-sm mb-3"><div class="card-header py-2"><strong>升级条件</strong></div><div class="card-body"><div class="row g-2">
+        <div class="col-md-6"><label class="form-label small">最低上传(GB)</label><input type="number" name="min_upload_gb" class="form-control form-control-sm" value="{{ user_class.min_upload_gb if user_class else 0 }}" step="0.1"></div>
+        <div class="col-md-6"><label class="form-label small">最低分享率</label><input type="number" name="min_ratio" class="form-control form-control-sm" value="{{ user_class.min_ratio if user_class else 0 }}" step="0.01"></div>
+        <div class="col-md-6"><label class="form-label small">最低做种(小时)</label><input type="number" name="min_seed_hours" class="form-control form-control-sm" value="{{ user_class.min_seed_hours if user_class else 0 }}"></div>
+        <div class="col-md-6"><label class="form-label small">最低注册(天)</label><input type="number" name="min_account_age_days" class="form-control form-control-sm" value="{{ user_class.min_account_age_days if user_class else 0 }}"></div>
+        <div class="col-md-6"><label class="form-label small">最低发帖</label><input type="number" name="min_forum_posts" class="form-control form-control-sm" value="{{ user_class.min_forum_posts if user_class else 0 }}"></div>
+        <div class="col-md-6"><label class="form-label small">最低完成</label><input type="number" name="min_snatches" class="form-control form-control-sm" value="{{ user_class.min_snatches if user_class else 0 }}"></div>
+    </div></div></div></div>
+    <div class="col-lg-6"><div class="card shadow-sm mb-3"><div class="card-header py-2"><strong>降级条件</strong></div><div class="card-body"><div class="row g-2">
+        <div class="col-md-6"><label class="form-label small">保持最低分享率</label><input type="number" name="keep_min_ratio" class="form-control form-control-sm" value="{{ user_class.keep_min_ratio if user_class else 0 }}" step="0.01"></div>
+        <div class="col-md-6"><label class="form-label small">保持最低做种(小时)</label><input type="number" name="keep_min_seed_hours" class="form-control form-control-sm" value="{{ user_class.keep_min_seed_hours if user_class else 0 }}"></div>
+    </div></div></div></div>
+    <div class="col-lg-6"><div class="card shadow-sm mb-3"><div class="card-header py-2"><strong>特权</strong></div><div class="card-body"><div class="row g-2">
+        <div class="col-md-4"><label class="form-label small">邀请/月</label><input type="number" name="invite_tokens_per_month" class="form-control form-control-sm" value="{{ user_class.invite_tokens_per_month if user_class else 0 }}"></div>
+        <div class="col-md-4"><label class="form-label small">私信上限</label><input type="number" name="pm_inbox_size" class="form-control form-control-sm" value="{{ user_class.pm_inbox_size if user_class else 100 }}"></div>
+        <div class="col-md-4"><label class="form-label small">积分倍率</label><input type="number" name="bonus_multiplier" class="form-control form-control-sm" value="{{ user_class.bonus_multiplier if user_class else 1.0 }}" step="0.1"></div>
+        <div class="col-md-4"><label class="form-label small">下载槽位</label><input type="number" name="download_slots" class="form-control form-control-sm" value="{{ user_class.download_slots if user_class else 3 }}"></div>
+        <div class="col-md-4"><label class="form-label small">等待时间(秒)</label><input type="number" name="wait_time_seconds" class="form-control form-control-sm" value="{{ user_class.wait_time_seconds if user_class else 0 }}"></div>
+        <div class="col-12"><div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="can_view_peers" {% if user_class and user_class.can_view_peers %}checked{% endif %}><label class="form-check-label small">查看Peer</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="can_use_freeleech_tokens" {% if user_class and user_class.can_use_freeleech_tokens %}checked{% endif %}><label class="form-check-label small">免费令牌</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="exempt_from_hnr" {% if user_class and user_class.exempt_from_hnr %}checked{% endif %}><label class="form-check-label small">H&R豁免</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="exempt_from_wait_time" {% if user_class and user_class.exempt_from_wait_time %}checked{% endif %}><label class="form-check-label small">等待豁免</label></div></div>
+    </div></div></div></div>
+</div>
+<button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> 保存</button>
+<a href="{{ url_for('admin.user_class_list') }}" class="btn btn-secondary">取消</a></form>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% macro torrent_row(torrent) %}
+<tr>
+    <td class="text-center">
+        <i class="bi bi-folder2-open text-warning"></i>
+        {% if torrent.is_freeleech %}
+            <span class="badge bg-success badge-sm">Free</span>
+        {% endif %}
+    </td>
+    <td>
+        <a href="{{ url_for('torrent.detail', torrent_id=torrent.id) }}" class="text-decoration-none fw-bold">
+            {{ torrent.name|truncate(80) }}
+        </a>
+        {% if torrent.is_sticky %}
+            <span class="badge bg-warning text-dark"><i class="bi bi-pin-angle-fill"></i> 置顶</span>
+        {% endif %}
+        {% if torrent.is_freeleech %}
+            <span class="badge bg-success">免费</span>
+        {% endif %}
+        {% if torrent.is_double_upload %}
+            <span class="badge bg-info">2x上传</span>
+        {% endif %}
+        {% if torrent.is_half_download %}
+            <span class="badge bg-warning">50%下载</span>
+        {% endif %}
+        <br>
+        <small class="text-muted">
+            {% if torrent.scene_group %}<span class="text-info">{{ torrent.scene_group }}</span> {% endif %}
+            {% if torrent.quality %}<span class="badge bg-secondary badge-sm">{{ torrent.quality }}</span>{% endif %}
+            {% if torrent.medium %}<span class="text-muted">{{ torrent.medium }}</span>{% endif %}
+            {% if torrent.codec %}<span class="badge bg-dark badge-sm">{{ torrent.codec }}</span>{% endif %}
+        </small>
+    </td>
+    <td class="text-end">
+        <span class="badge bg-success">{{ torrent.seeders }}</span>
+    </td>
+    <td class="text-end">
+        <span class="badge bg-danger">{{ torrent.leechers }}</span>
+    </td>
+    <td class="text-end">
+        <span class="badge bg-info">{{ torrent.times_completed }}</span>
+    </td>
+    <td class="text-end text-muted small">
+        {{ torrent.size|format_bytes }}
+    </td>
+    <td class="text-muted small">
+        {% if not torrent.anonymous and torrent.uploader %}
+            <a href="{{ url_for('user.profile', user_id=torrent.uploader_id) }}" class="text-decoration-none">
+                {{ torrent.uploader.username }}
+            </a>
+        {% else %}
+            <em>匿名</em>
+        {% endif %}
+    </td>
+    <td class="text-muted small">
+        {{ torrent.added_at|time_ago }}
+    </td>
+</tr>
+{% endmacro %}
+
+{% macro pagination(paginated, endpoint, endpoint_args=None) %}
+{% if paginated.pages > 1 %}
+<nav>
+    <ul class="pagination justify-content-center">
+        {% set args = endpoint_args or {} %}
+        {% set current_args = request.args.to_dict() %}
+        {% set _ = current_args.pop('page', None) %}
+
+        <!-- First -->
+        {% if paginated.has_prev %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for(endpoint, page=1, **dict(current_args, **args)) }}">&laquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+        {% endif %}
+
+        <!-- Previous -->
+        {% if paginated.has_prev %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for(endpoint, page=paginated.prev_num, **dict(current_args, **args)) }}">&lsaquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">&lsaquo;</span></li>
+        {% endif %}
+
+        <!-- Page numbers -->
+        {% for page_num in paginated.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if page_num %}
+                {% if page_num == paginated.page %}
+                <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for(endpoint, page=page_num, **dict(current_args, **args)) }}">{{ page_num }}</a>
+                </li>
+                {% endif %}
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Next -->
+        {% if paginated.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for(endpoint, page=paginated.next_num, **dict(current_args, **args)) }}">&rsaquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">&rsaquo;</span></li>
+        {% endif %}
+
+        <!-- Last -->
+        {% if paginated.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for(endpoint, page=paginated.pages, **dict(current_args, **args)) }}">&raquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endmacro %}
+
+{% macro ratio_bar(ratio) %}
+<div class="progress" style="height: 4px;" title="Ratio: {{ ratio|format_ratio }}">
+    {% set pct = (ratio * 50) if ratio != float('inf') else 100 %}
+    {% set capped = [pct, 100]|min %}
+    {% set cls = ratio|format_ratio_class %}
+    <div class="progress-bar {{ cls }}" style="width: {{ capped }}%"></div>
+</div>
+{% endmacro %}

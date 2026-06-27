@@ -1,0 +1,19 @@
+{% extends "admin/layout.html" %}{% import "macros.html" as macros %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<h4 class="mb-3"><i class="bi bi-flag"></i> 举报处理</h4>
+<ul class="nav nav-tabs mb-3"><li class="nav-item"><a class="nav-link {{ 'active' if status=='pending' }}" href="?status=pending">待处理</a></li><li class="nav-item"><a class="nav-link {{ 'active' if status=='resolved' }}" href="?status=resolved">已处理</a></li><li class="nav-item"><a class="nav-link {{ 'active' if status=='all' }}" href="?status=all">全部</a></li></ul>
+<div class="card shadow-sm"><div class="table-responsive"><table class="table table-hover table-sm mb-0 small"><thead class="table-dark"><tr><th>ID</th><th>举报人</th><th>目标</th><th>原因</th><th>时间</th><th>操作</th></tr></thead>
+<tbody>{% for r in paginated.items %}<tr><td>{{ r.id }}</td><td>{{ r.reporter.username if r.reporter else '?' }}</td><td>{{ r.target_description }}</td><td>{{ r.reason }}{% if r.details %}<br><small class="text-muted">{{ r.details[:100] }}</small>{% endif %}</td><td>{{ r.created_at|time_ago }}</td>
+<td>{% if not r.resolved %}
+    <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#resolveModal{{ r.id }}"><i class="bi bi-check-circle"></i> 处理</button>
+    <div class="modal fade" id="resolveModal{{ r.id }}" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><form method="POST" action="{{ url_for('admin.report_resolve', report_id=r.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="modal-header"><h6 class="modal-title">处理举报 #{{ r.id }}</h6></div><div class="modal-body">
+    <div class="mb-2"><select name="action" class="form-select form-select-sm"><option value="resolve">确认违规</option><option value="dismiss">驳回</option></select></div>
+    <textarea name="resolution_note" class="form-control form-control-sm mb-2" rows="2" placeholder="备注"></textarea>
+    <div class="form-check"><input class="form-check-input" type="checkbox" name="send_pm"><label class="form-check-label small">通知举报人</label></div>
+    <textarea name="pm_message" class="form-control form-control-sm mt-2" rows="2" placeholder="通知消息"></textarea></div>
+    <div class="modal-footer"><button type="submit" class="btn btn-primary btn-sm">提交</button><button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button></div></form></div></div></div>
+{% else %}<span class="badge bg-success">已处理</span><br><small class="text-muted">{{ r.resolution_note or '' }}</small>{% endif %}</td></tr>
+{% else %}<tr><td colspan="6" class="text-muted text-center py-3">暂无举报</td></tr>{% endfor %}</tbody></table></div>
+<div class="card-footer py-2">{{ macros.pagination(paginated, 'admin.reports', status=status) }}</div></div>{% endblock %}

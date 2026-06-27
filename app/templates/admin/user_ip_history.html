@@ -1,0 +1,11 @@
+{% extends "admin/layout.html" %}{% import "macros.html" as macros %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item"><a href="{{ url_for('admin.user_edit', user_id=user.id) }}">{{ user.username }}</a></li><li class="breadcrumb-item active">IP历史</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<h4 class="mb-3"><i class="bi bi-globe"></i> {{ user.username }} - IP活动历史</h4>
+<div class="card shadow-sm"><div class="table-responsive"><table class="table table-hover table-sm mb-0 small"><thead class="table-dark"><tr><th>IP</th><th>事件</th><th>User-Agent</th><th>端口</th><th>国家</th><th>城市</th><th>时间</th></tr></thead>
+<tbody>{% for ip in paginated.items %}<tr><td><code>{{ ip.ip }}</code></td><td><span class="badge bg-info">{{ ip.event_type }}</span></td>
+    <td class="text-muted text-truncate" style="max-width:250px">{{ ip.user_agent or '' }}</td><td>{{ ip.port or '' }}</td>
+    <td>{{ ip.geo_country or '' }}</td><td>{{ ip.geo_city or '' }}</td><td>{{ ip.created_at|time_ago }}</td></tr>
+{% else %}<tr><td colspan="7" class="text-muted text-center py-3">无IP记录</td></tr>{% endfor %}</tbody></table></div>
+<div class="card-footer py-2">{{ macros.pagination(paginated, 'admin.user_ip_history', user_id=user.id) }}</div></div>
+{% endblock %}

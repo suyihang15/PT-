@@ -1,0 +1,11 @@
+<form class="d-flex me-2" action="{{ url_for('main.search') }}" method="GET">
+    <div class="input-group input-group-sm">
+        <input type="text" name="q" class="form-control" placeholder="搜索种子..."
+               value="{{ request.args.get('q', '') }}" aria-label="搜索"
+               id="global-search-input" autocomplete="off">
+        <button class="btn btn-primary" type="submit">
+            <i class="bi bi-search"></i>
+        </button>
+    </div>
+    <div id="search-suggestions" class="dropdown-menu" style="display:none; position:absolute;"></div>
+</form>

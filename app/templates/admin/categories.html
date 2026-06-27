@@ -1,0 +1,12 @@
+{% extends "admin/layout.html" %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-3"><h4 class="mb-0"><i class="bi bi-folder"></i> 分类管理</h4><a href="{{ url_for('admin.category_add') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> 添加分类</a></div>
+<div class="card shadow-sm"><div class="table-responsive"><table class="table table-hover table-sm mb-0 small"><thead class="table-dark"><tr><th>ID</th><th>名称</th><th>Slug</th><th>图标</th><th>父分类</th><th>排序</th><th>最低角色</th><th>种子数</th><th>操作</th></tr></thead>
+<tbody>{% for cat in categories %}
+<tr class="{% if cat.parent_id %}table-light{% endif %}"><td>{{ cat.id }}</td><td>{% if cat.parent_id %}—{% endif %} {{ cat.name }}</td><td><code>{{ cat.slug }}</code></td><td><i class="bi bi-{{ cat.icon or 'folder' }}"></i></td>
+    <td>{{ cat.parent.name if cat.parent else '-' }}</td><td>{{ cat.sort_order }}</td><td>{{ cat.min_role_view }}</td><td>{{ cat.torrents.count() }}</td>
+    <td><a href="{{ url_for('admin.category_edit', cat_id=cat.id) }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil"></i></a>
+        <form method="POST" action="{{ url_for('admin.category_delete', cat_id=cat.id) }}" class="d-inline" onsubmit="return confirm('确定删除?')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button></form></td></tr>
+{% endfor %}</tbody></table></div></div>
+{% endblock %}

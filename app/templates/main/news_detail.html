@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }} - {{ site_name }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">首页</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('main.news_list') }}">站点公告</a></li>
+                <li class="breadcrumb-item active">{{ article.title|truncate(30) }}</li>
+            </ol>
+        </nav>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3>{{ article.title }}</h3>
+                <p class="text-muted small">
+                    <i class="bi bi-person"></i> {{ article.author.username }}
+                    | <i class="bi bi-clock"></i> {{ article.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    | <i class="bi bi-eye"></i> {{ article.view_count }} 次阅读
+                    {% if article.updated_at %}
+                    | <i class="bi bi-pencil"></i> 更新于 {{ article.updated_at.strftime('%Y-%m-%d %H:%M') }}
+                    {% endif %}
+                </p>
+                <hr>
+                <div class="content">
+                    {% if article.content_html %}
+                        {{ article.content_html|safe }}
+                    {% else %}
+                        {{ article.content|nl2br }}
+                    {% endif %}
+                </div>
+                <hr>
+                <a href="{{ url_for('main.news_list') }}" class="btn btn-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> 返回列表
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

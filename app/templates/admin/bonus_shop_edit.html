@@ -1,0 +1,17 @@
+{% extends "admin/layout.html" %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item"><a href="{{ url_for('admin.bonus_shop') }}">商店管理</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<h4 class="mb-3"><i class="bi bi-{{ 'pencil-square' if item else 'plus-circle' }}"></i> {{ title }}</h4>
+<div class="card shadow-sm"><div class="card-body"><form method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="row g-3"><div class="col-md-6"><label class="form-label small fw-bold">名称</label><input type="text" name="name" class="form-control form-control-sm" value="{{ item.name if item else '' }}" required></div>
+    <div class="col-md-3"><label class="form-label small fw-bold">价格(积分)</label><input type="number" name="price" class="form-control form-control-sm" value="{{ item.price if item else 0 }}"></div>
+    <div class="col-md-3"><label class="form-label small fw-bold">库存(留空=无限)</label><input type="number" name="stock" class="form-control form-control-sm" value="{{ item.stock if item and item.stock else '' }}"></div>
+    <div class="col-md-4"><label class="form-label small fw-bold">效果类型</label><select name="effect_type" class="form-select form-select-sm"><option value="upload_credit">上传流量</option><option value="invite">邀请码</option><option value="vip_days">VIP天数</option><option value="custom_title">自定义头衔</option><option value="bonus_multiplier">积分倍率</option></select></div>
+    <div class="col-md-4"><label class="form-label small fw-bold">效果值(JSON)</label><input type="text" name="effect_value" class="form-control form-control-sm" value="{{ item.effect_value if item else '{}' }}"></div>
+    <div class="col-md-4"><label class="form-label small fw-bold">图标</label><input type="text" name="icon" class="form-control form-control-sm" value="{{ item.icon if item else '' }}"></div>
+    <div class="col-md-4"><label class="form-label small fw-bold">最低角色</label><select name="min_role" class="form-select form-select-sm"><option value="User">User</option><option value="PowerUser">PowerUser</option><option value="VIP">VIP</option></select></div>
+    <div class="col-md-4"><label class="form-label small fw-bold">每人限购(留空=不限)</label><input type="number" name="max_purchases_per_user" class="form-control form-control-sm" value="{{ item.max_purchases_per_user if item else '' }}"></div>
+    <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" {% if not item or item.is_active %}checked{% endif %}><label class="form-check-label small">上架</label></div></div>
+    <div class="col-12"><label class="form-label small fw-bold">描述</label><textarea name="description" class="form-control form-control-sm" rows="2">{{ item.description if item else '' }}</textarea></div>
+    </div><button type="submit" class="btn btn-primary mt-3"><i class="bi bi-save"></i> 保存</button><a href="{{ url_for('admin.bonus_shop') }}" class="btn btn-secondary mt-3">取消</a></form></div></div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}常见问题 - {{ site_name }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3 class="mb-4"><i class="bi bi-question-circle"></i> 常见问题</h3>
+
+                <h5>Q: 如何使用PT站点？</h5>
+                <p>需要一个支持BT协议的客户端，如 qBittorrent、Transmission、uTorrent 等。下载种子后用客户端打开即可开始下载。</p>
+
+                <h5>Q: 什么是分享率？</h5>
+                <p>分享率 = 上传量 ÷ 下载量。分享率越高，表示您贡献越多。低于0.4将无法下载新种子。</p>
+
+                <h5>Q: 什么是Freeleech（免费种子）？</h5>
+                <p>免费种子的下载量不会计入您的统计数据，但上传量仍然计入。这是提高分享率的好方法。</p>
+
+                <h5>Q: 如何获取邀请码？</h5>
+                <p>PowerUser及以上等级的用户可以在用户设置中生成邀请码。VIP和管理员可以直接获得邀请名额。</p>
+
+                <h5>Q: 什么是做种积分？</h5>
+                <p>做种积分根据您做种的种子数量和大小计算，每小时自动发放。积分可用于在积分商城兑换上传量、邀请码等。</p>
+
+                <h5>Q: 什么是H&R（Hit & Run）？</h5>
+                <p>下载完成后不按规定做种足够时间即为H&R违规。下载完成后需在7天内累计做种72小时。</p>
+
+                <h5>Q: 如何提高分享率？</h5>
+                <ul>
+                    <li>下载免费种子（不计算下载量）</li>
+                    <li>长期做种获取积分，兑换上传量</li>
+                    <li>发布热门种子</li>
+                    <li>保持种子在线以持续上传</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

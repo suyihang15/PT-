@@ -1,0 +1,21 @@
+{% extends "admin/layout.html" %}{% import "macros.html" as macros %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-3"><h4 class="mb-0"><i class="bi bi-cloud-arrow-down"></i> 种子管理</h4><span class="text-muted small">共 {{ paginated.total }} 个种子</span></div>
+<div class="card shadow-sm mb-3"><div class="card-body py-2"><form method="GET" action="{{ url_for('admin.torrents') }}" class="row g-2">
+    <div class="col-md-3"><input type="text" name="q" class="form-control form-control-sm" placeholder="搜索种子名称..." value="{{ search_params.get('q','') }}"></div>
+    <div class="col-md-2"><select name="category" class="form-select form-select-sm"><option value="">全部分类</option>{% for cat in categories %}<option value="{{ cat.id }}" {% if search_params.get('category')|int==cat.id %}selected{% endif %}>{{ cat.name }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><select name="status" class="form-select form-select-sm"><option value="">全部</option><option value="visible">可见</option><option value="banned">禁用</option><option value="freeleech">免费</option><option value="sticky">置顶</option></select></div>
+    <div class="col-md-2"><select name="sort" class="form-select form-select-sm"><option value="added_at_desc">时间↓</option><option value="size_desc">大小↓</option><option value="seeders_desc">做种↓</option></select></div>
+    <div class="col-md-3"><button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-search"></i></button> <a href="{{ url_for('admin.torrents') }}" class="btn btn-outline-secondary btn-sm">清除</a></div>
+</form></div></div>
+<div class="card shadow-sm"><div class="table-responsive"><table class="table table-hover table-sm mb-0 small"><thead class="table-dark"><tr><th>ID</th><th>名称</th><th>分类</th><th>上传者</th><th>大小</th><th>S/L</th><th>促销</th><th>状态</th><th>时间</th><th>操作</th></tr></thead>
+<tbody>{% for t in paginated.items %}<tr class="{% if t.banned %}table-danger{% endif %}"><td>{{ t.id }}</td>
+    <td class="text-truncate" style="max-width:250px"><a href="{{ url_for('admin.torrent_edit', torrent_id=t.id) }}">{{ t.name }}</a></td>
+    <td><span class="badge bg-secondary">{{ t.category.name if t.category else '?' }}</span></td>
+    <td class="small">{{ '匿名' if t.anonymous else t.uploader.username }}</td><td>{{ t.size|format_bytes }}</td>
+    <td><span class="text-success">{{ t.seeders }}</span>/<span class="text-danger">{{ t.leechers }}</span></td>
+    <td>{% if t.is_freeleech %}<span class="badge bg-success">免费</span>{% endif %}{% if t.is_double_upload %}<span class="badge bg-info">2x</span>{% endif %}{% if t.is_half_download %}<span class="badge bg-warning">半</span>{% endif %}{% if t.is_sticky %}<span class="badge bg-dark">顶</span>{% endif %}</td>
+    <td>{% if t.banned %}<span class="badge bg-danger">禁用</span>{% elif not t.visible %}<span class="badge bg-secondary">隐藏</span>{% else %}<span class="badge bg-success">正常</span>{% endif %}</td>
+    <td>{{ t.added_at|time_ago }}</td><td><a href="{{ url_for('admin.torrent_edit', torrent_id=t.id) }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil"></i></a></td></tr>{% else %}<tr><td colspan="10" class="text-muted text-center py-4">无匹配种子</td></tr>{% endfor %}</tbody></table></div>
+<div class="card-footer py-2">{{ macros.pagination(paginated, 'admin.torrents', **search_params) }}</div></div>{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "admin/layout.html" %}{% import "macros.html" as macros %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-3"><h4 class="mb-0"><i class="bi bi-shield-x"></i> IP封禁管理</h4></div>
+<div class="card shadow-sm mb-3"><div class="card-body"><form method="POST" action="{{ url_for('admin.ip_ban_add') }}" class="row g-2"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="col-md-3"><input type="text" name="ip_address" class="form-control form-control-sm" placeholder="IP地址或CIDR (如 192.168.1.0/24)" required></div>
+    <div class="col-md-4"><input type="text" name="reason" class="form-control form-control-sm" placeholder="封禁理由" required></div>
+    <div class="col-md-2"><input type="number" name="duration_days" class="form-control form-control-sm" placeholder="天数(留空=永久)"></div>
+    <div class="col-md-3"><button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-plus-circle"></i> 添加IP封禁</button></div>
+</form></div></div>
+<div class="card shadow-sm"><div class="table-responsive"><table class="table table-hover table-sm mb-0 small"><thead class="table-dark"><tr><th>ID</th><th>IP</th><th>理由</th><th>操作人</th><th>状态</th><th>过期</th><th>时间</th><th>操作</th></tr></thead>
+<tbody>{% for ban in paginated.items %}<tr><td>{{ ban.id }}</td><td><code>{{ ban.ip_address }}</code></td><td>{{ ban.reason[:60] }}</td><td>{{ ban.operator.username if ban.operator else '?' }}</td>
+    <td>{% if ban.is_active and not ban.is_expired %}<span class="badge bg-danger">生效</span>{% else %}<span class="badge bg-secondary">失效</span>{% endif %}</td>
+    <td>{{ ban.expires_at.strftime('%Y-%m-%d') if ban.expires_at else '永久' }}</td><td>{{ ban.created_at|time_ago }}</td>
+    <td>{% if ban.is_active %}<form method="POST" action="{{ url_for('admin.ip_ban_delete', ban_id=ban.id) }}" class="d-inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-outline-success btn-sm"><i class="bi bi-unlock"></i> 解除</button></form>{% endif %}</td></tr>
+{% else %}<tr><td colspan="8" class="text-muted text-center py-3">暂无IP封禁</td></tr>{% endfor %}</tbody></table></div>
+<div class="card-footer py-2">{{ macros.pagination(paginated, 'admin.ip_bans') }}</div></div>{% endblock %}

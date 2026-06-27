@@ -1,0 +1,11 @@
+{% extends "admin/layout.html" %}{% import "macros.html" as macros %}
+{% block breadcrumb %}<nav aria-label="breadcrumb"><ol class="breadcrumb small mb-0"><li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">管理面板</a></li><li class="breadcrumb-item active">{{ title }}</li></ol></nav>{% endblock %}
+{% block admin_content %}
+<h4 class="mb-3"><i class="bi bi-exclamation-triangle"></i> H&R违规管理</h4>
+<ul class="nav nav-tabs mb-3"><li><a class="nav-link {{ 'active' if status=='unresolved' }}" href="?status=unresolved">未处理</a></li><li><a class="nav-link {{ 'active' if status=='resolved' }}" href="?status=resolved">已处理</a></li></ul>
+<div class="card shadow-sm"><div class="table-responsive"><table class="table table-hover table-sm mb-0 small"><thead class="table-dark"><tr><th>ID</th><th>用户</th><th>种子</th><th>做种时间</th><th>达成比例</th><th>警告已发</th><th>时间</th><th>操作</th></tr></thead>
+<tbody>{% for v in paginated.items %}<tr><td>{{ v.id }}</td><td>{{ v.user.username if v.user else '?' }}</td><td class="text-truncate" style="max-width:200px">{{ v.torrent.name if v.torrent else '已删除' }}</td><td>{{ v.seed_time_secs|format_duration }}</td><td>{{ v.ratio_achieved }}</td>
+    <td>{% if v.warning_sent %}<span class="badge bg-success">是</span>{% else %}<span class="badge bg-danger">否</span>{% endif %}</td><td>{{ v.created_at|time_ago }}</td>
+    <td>{% if not v.resolved %}<form method="POST" action="{{ url_for('admin.hnr_resolve', violation_id=v.id) }}" class="d-inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="resolve"><input type="text" name="note" class="form-control form-control-sm mb-1" placeholder="备注"><button class="btn btn-outline-success btn-sm"><i class="bi bi-check-circle"></i> 处理</button></form>{% else %}<span class="badge bg-secondary">已处理</span>{% endif %}</td></tr>
+{% else %}<tr><td colspan="8" class="text-muted text-center py-3">暂无H&R违规</td></tr>{% endfor %}</tbody></table></div>
+<div class="card-footer py-2">{{ macros.pagination(paginated, 'admin.hnr', status=status) }}</div></div>{% endblock %}
