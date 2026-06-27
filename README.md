@@ -955,9 +955,12 @@ DATABASE_URL=sqlite:///app.db
 
 本项目仅供学习和技术研究使用。
 
-Copyright (c) 2024 - Present. All rights reserved.
 
 **再次提醒：请遵守您所在地区的法律法规，不要使用本系统进行任何违法活动。**
 
 ---
+
+## 效果展示    
+<img width="1269" height="673" alt="屏幕截图 2026-06-27 093320" src="https://github.com/user-attachments/assets/ca891370-42d5-4425-9d69-f69e13326d24" />    
+<img width="1277" height="672" alt="屏幕截图 2026-06-27 093248" src="https://github.com/user-attachments/assets/f95476b5-62dd-40d1-9229-2cb605db4877" />
 
